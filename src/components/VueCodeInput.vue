@@ -1,11 +1,16 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref, watch } from "vue"
+import { computed, onMounted, ref, watch, type PropType } from "vue"
 
 const props = defineProps({
   modelValue: {
     type: String,
     required: false,
     default: "",
+  },
+  modelModifiers: {
+    type: Object as PropType<{ pin: boolean }>,
+    required: false,
+    default: () => ({}),
   },
   maxLength: {
     type: Number,
@@ -46,6 +51,8 @@ const inputs = ref<HTMLInputElement[]>([])
 const currentInputIndex = ref(0)
 const currentInput = computed(() => inputs.value[currentInputIndex.value])
 
+const pattern = computed(() => (props.modelModifiers.pin ? /^[0-9]$/ : props.regex))
+
 const handleKeydown = (event: KeyboardEvent) => {
   if (event.key === "ArrowUp" || event.key === "ArrowLeft" || event.key === "Backspace") {
     event.preventDefault()
@@ -78,10 +85,14 @@ const handleKeydown = (event: KeyboardEvent) => {
 
     return
   }
+
+  if (event.key.match(pattern.value)) {
+    currentInput.value.value = ""
+  }
 }
 
 const handleKeyup = (event: KeyboardEvent) => {
-  if (event.key.match(props.regex)) {
+  if (event.key.match(pattern.value)) {
     handleInput(event.key)
     currentInputIndex.value = Math.min(currentInputIndex.value + 1, props.maxLength - 1)
   }
@@ -140,7 +151,8 @@ onMounted(() => {
         :key="j"
         @focus="changeCurrentInputIndex((i - 1) * props.groupSize + j - 1)"
         class="item"
-        type="text"
+        :type="props.modelModifiers.pin ? 'number' : 'text'"
+        :pattern="props.modelModifiers.pin ? '[0-9]*' : props.regex.source"
         maxlength="1"
         :disabled="disabled"
       />
@@ -170,11 +182,19 @@ onMounted(() => {
 }
 
 .item {
+  appearance: textfield;
+
   border: 1px solid grey;
   border-radius: 0.25em;
   caret-color: transparent;
 
   transition: border 0.2s ease-in-out;
+
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
 
   &:focus {
     border: 1px solid blue;

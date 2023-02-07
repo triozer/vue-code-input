@@ -11,5 +11,5 @@ const onComplete = (code: string) => {
 
 <template>
   Current code : {{ code }}
-  <vue-code-input v-model="code" @completed="onComplete" :max-length="6" :group-size="3" />
+  <vue-code-input v-model.pin="code" @completed="onComplete" :max-length="6" :group-size="3" />
 </template>
