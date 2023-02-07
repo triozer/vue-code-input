@@ -26,9 +26,9 @@ The code input component accepts the following props:
 
 The code input component emits the following events:
 
-- `input`: Emitted whenever the input value changes.
+- `update:modelValue`: Emitted whenever the input value changes.
 validated: Emitted when the input has been validated.
-- `complete`: Emitted when the input has been filled.
+- `completed`: Emitted when the input has been filled.
 
 ## Example
 Here is an example of how you might use the code input component with the autoValidate prop set to true:

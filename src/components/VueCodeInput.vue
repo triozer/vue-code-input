@@ -10,10 +10,16 @@ const props = defineProps({
   maxLength: {
     type: Number,
     default: 4,
+    validator: (value: number) => value > 0,
   },
   regex: {
     type: RegExp,
     default: /^[A-z0-9]$/,
+  },
+  groupSize: {
+    type: Number,
+    default: 4,
+    validator: (value: number) => value > 0,
   },
 })
 
@@ -42,9 +48,7 @@ const handleKeydown = (event: KeyboardEvent) => {
         inputs.value[i].value = ""
       }
 
-      if (currentInputIndex.value !== value.value.length - 1) {
-        return
-      }
+      return
     }
 
     if (currentInputIndex.value > 0) {
@@ -104,6 +108,8 @@ const handleInput = (key: string) => {
   }
 }
 
+const groups = computed(() => Math.ceil(props.maxLength / props.groupSize))
+
 watch(currentInputIndex, () => {
   currentInput.value.focus()
 })
@@ -115,16 +121,19 @@ onMounted(() => {
 
 <template>
   <div class="container" @keydown="handleKeydown" @keyup="handleKeyup">
-    <input
-      ref="inputs"
-      v-for="i in maxLength"
-      @mousedown="(e) => handleItemClick(e, i - 1)"
-      @focus="changeCurrentInputIndex(i - 1)"
-      :key="i"
-      class="item"
-      type="text"
-      maxlength="1"
-    />
+    <template v-for="i in groups" :key="`group-${i}`">
+      <input
+        ref="inputs"
+        v-for="j in Math.min(groupSize, maxLength - (i - 1) * groupSize)"
+        @mousedown="(e) => handleItemClick(e, (i - 1) * props.groupSize + j - 1)"
+        :key="j"
+        @focus="changeCurrentInputIndex((i - 1) * props.groupSize + j - 1)"
+        class="item"
+        type="text"
+        maxlength="1"
+      />
+      <span v-if="i !== groups" class="separator">-</span>
+    </template>
   </div>
 </template>
 
@@ -132,6 +141,14 @@ onMounted(() => {
 .container {
   display: flex;
   gap: 0.25rem;
+}
+
+.separator {
+  height: 1em;
+  width: 1em;
+  padding: 0.5em;
+  font-size: 2em;
+  text-align: center;
 }
 
 .item {
