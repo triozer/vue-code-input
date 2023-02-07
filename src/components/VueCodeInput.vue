@@ -62,8 +62,6 @@ const handleKeydown = (event: KeyboardEvent) => {
       for (let i = currentInputIndex.value; i < props.maxLength; i++) {
         inputs.value[i].value = ""
       }
-
-      return
     }
 
     if (currentInputIndex.value > 0) {
