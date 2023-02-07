@@ -22,8 +22,8 @@ const expectedPin = computed(() =>
     .padStart(maxLength.value, "0")
 )
 
-const onComplete = (code: string) => {
-  console.log("Completed", code)
+const onComplete = (code: string, expectedCode: string) => {
+  console.log("Completed", code === expectedCode ? "✅" : "❌")
 }
 </script>
 
@@ -46,7 +46,7 @@ const onComplete = (code: string) => {
     <p>Current code : {{ code }}</p>
     <vue-code-input
       v-model="code"
-      @completed="onComplete"
+      @completed="(code) => onComplete(code, expectedCode)"
       :max-length="maxLength"
       :group-size="groupSize"
     />
@@ -57,7 +57,7 @@ const onComplete = (code: string) => {
     <p>Current pin : {{ pin }}</p>
     <vue-code-input
       v-model.pin="pin"
-      @completed="onComplete"
+      @completed="(code) => onComplete(code, expectedPin)"
       :max-length="maxLength"
       :group-size="groupSize"
     />
