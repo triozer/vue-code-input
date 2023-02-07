@@ -25,6 +25,10 @@ const props = defineProps({
     type: String,
     default: null,
   },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const emit = defineEmits(["update:modelValue", "completed"])
@@ -138,6 +142,7 @@ onMounted(() => {
         class="item"
         type="text"
         maxlength="1"
+        :disabled="disabled"
       />
       <span v-if="i !== groups" class="separator">-</span>
     </template>
