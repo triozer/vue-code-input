@@ -21,6 +21,10 @@ const props = defineProps({
     default: 4,
     validator: (value: number) => value > 0,
   },
+  prefix: {
+    type: String,
+    default: null,
+  },
 })
 
 const emit = defineEmits(["update:modelValue", "completed"])
@@ -121,6 +125,9 @@ onMounted(() => {
 
 <template>
   <div class="container" @keydown="handleKeydown" @keyup="handleKeyup">
+    <template v-if="props.prefix">
+      <span class="prefix">{{ props.prefix }}</span>
+    </template>
     <template v-for="i in groups" :key="`group-${i}`">
       <input
         ref="inputs"
@@ -143,20 +150,21 @@ onMounted(() => {
   gap: 0.25rem;
 }
 
-.separator {
+.separator,
+.prefix,
+.item {
   height: 1em;
-  width: 1em;
   padding: 0.5em;
   font-size: 2em;
   text-align: center;
 }
 
+.separator,
 .item {
-  height: 1em;
   width: 1em;
-  padding: 0.5em;
-  font-size: 2em;
-  text-align: center;
+}
+
+.item {
   border: 1px solid grey;
   border-radius: 0.25em;
   caret-color: transparent;
