@@ -2,8 +2,8 @@
 import { computed, ref } from "vue"
 import VueCodeInput from "./components/VueCodeInput.vue"
 
-const maxLength = ref(6)
-const groupSize = ref(2)
+const maxLength = ref(3)
+const groupSize = ref(1)
 
 const code = ref("")
 const expectedCode = computed(() => {
@@ -60,6 +60,21 @@ const onComplete = (code: string, expectedCode: string) => {
       @completed="(code) => onComplete(code, expectedPin)"
       :max-length="maxLength"
       :group-size="groupSize"
+    />
+  </div>
+  <div>
+    <h2>Prefix</h2>
+    <vue-code-input :max-length="1" prefix="G" />
+  </div>
+  <div>
+    <h2>Uppercase</h2>
+    <p>Expected code : {{ expectedCode.toUpperCase() }}</p>
+    <p>Current code : {{ code }}</p>
+    <vue-code-input
+      v-model.uppercase="code"
+      :max-length="maxLength"
+      :group-size="groupSize"
+      @completed="(code) => onComplete(code, expectedCode.toUpperCase())"
     />
   </div>
 </template>

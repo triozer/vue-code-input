@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref, watch, type PropType } from "vue"
+import { computed, nextTick, onMounted, ref, watch, type PropType } from "vue"
 
 const props = defineProps({
   modelValue: {
@@ -8,7 +8,7 @@ const props = defineProps({
     default: "",
   },
   modelModifiers: {
-    type: Object as PropType<{ pin: boolean }>,
+    type: Object as PropType<{ pin: boolean; uppercase: boolean }>,
     required: false,
     default: () => ({}),
   },
@@ -51,7 +51,17 @@ const inputs = ref<HTMLInputElement[]>([])
 const currentInputIndex = ref(0)
 const currentInput = computed(() => inputs.value[currentInputIndex.value])
 
-const pattern = computed(() => (props.modelModifiers.pin ? /^[0-9]$/ : props.regex))
+const pattern = computed(() => {
+  if (props.modelModifiers.pin) {
+    return /^\d$/
+  }
+
+  if (props.modelModifiers.uppercase) {
+    return new RegExp(props.regex.source.toUpperCase())
+  }
+
+  return props.regex
+})
 
 const handleKeydown = (event: KeyboardEvent) => {
   if (event.key === "ArrowUp" || event.key === "ArrowLeft" || event.key === "Backspace") {
@@ -84,15 +94,22 @@ const handleKeydown = (event: KeyboardEvent) => {
     return
   }
 
-  if (event.key.match(pattern.value)) {
-    currentInput.value.value = ""
+  const key = props.modelModifiers.uppercase ? event.key.toUpperCase() : event.key
+
+  if (key.match(pattern.value)) {
+    event.preventDefault()
   }
 }
 
 const handleKeyup = (event: KeyboardEvent) => {
-  if (event.key.match(pattern.value)) {
-    handleInput(event.key)
-    currentInputIndex.value = Math.min(currentInputIndex.value + 1, props.maxLength - 1)
+  const key = props.modelModifiers.uppercase ? event.key.toUpperCase() : event.key
+
+  if (key.match(pattern.value)) {
+    handleInput(key)
+    nextTick(() => {
+      currentInputIndex.value = Math.min(currentInputIndex.value + 1, props.maxLength - 1)
+      currentInput.value.focus()
+    })
   }
 }
 
@@ -151,7 +168,7 @@ onMounted(() => {
         @focus="changeCurrentInputIndex((i - 1) * props.groupSize + j - 1)"
         class="item"
         :type="props.modelModifiers.pin ? 'number' : 'text'"
-        :pattern="props.modelModifiers.pin ? '[0-9]*' : props.regex.source"
+        :pattern="props.modelModifiers.pin ? '[0-9]*' : pattern.source"
         maxlength="1"
         :disabled="disabled"
       />
