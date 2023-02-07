@@ -110,7 +110,8 @@ const handleItemClick = (event: MouseEvent, index: number) => {
 }
 
 const changeCurrentInputIndex = (index: number) => {
-  currentInputIndex.value = index
+  currentInputIndex.value = Math.min(value.value.length, index)
+  currentInput.value.focus()
 }
 
 const handleInput = (key: string) => {
