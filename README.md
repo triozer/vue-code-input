@@ -18,9 +18,9 @@ pnpm install @triozer/vue-code-input
 
 The code input component accepts the following props:
 
+- `maxLength`: The maximum length of the input.
 - `regex`: A string pattern that the input must match to be considered valid.
 - `groupSize`: The number of characters in each group.
-- `autoValidate`: A boolean value indicating whether the input should be automatically validated as the user types.
 
 ## Events
 
