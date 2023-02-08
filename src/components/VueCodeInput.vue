@@ -64,10 +64,18 @@ const pattern = computed(() => {
 })
 
 const handleKeydown = (event: KeyboardEvent) => {
-  if (event.key === "ArrowUp" || event.key === "ArrowLeft" || event.key === "Backspace") {
+  if (
+    event.key === "ArrowUp" ||
+    event.key === "ArrowLeft" ||
+    event.key === "Backspace" ||
+    event.key === "Delete"
+  ) {
     event.preventDefault()
 
-    if (event.key === "Backspace" && currentInput.value.value.length !== 0) {
+    if (
+      (event.key === "Backspace" || event.key === "Delete") &&
+      currentInput.value.value.length !== 0
+    ) {
       value.value = value.value.slice(0, currentInputIndex.value)
       for (let i = currentInputIndex.value; i < props.maxLength; i++) {
         inputs.value[i].value = ""
@@ -159,20 +167,23 @@ onMounted(() => {
     <template v-if="props.prefix">
       <span class="prefix">{{ props.prefix }}</span>
     </template>
-    <template v-for="i in groups" :key="`group-${i}`">
-      <input
-        ref="inputs"
-        v-for="j in Math.min(groupSize, maxLength - (i - 1) * groupSize)"
-        @mousedown="(e) => handleItemClick(e, (i - 1) * props.groupSize + j - 1)"
-        :key="j"
-        @focus="changeCurrentInputIndex((i - 1) * props.groupSize + j - 1)"
-        class="item"
-        :type="props.modelModifiers.pin ? 'number' : 'text'"
-        :pattern="props.modelModifiers.pin ? '[0-9]*' : pattern.source"
-        maxlength="1"
-        :disabled="disabled"
-      />
-      <span v-if="i !== groups" class="separator">-</span>
+    <template v-if="groups > 0 && groupSize > 0">
+      <template v-for="i in groups" :key="`group-${i}`">
+        <input
+          ref="inputs"
+          v-for="j in Math.min(groupSize, maxLength - (i - 1) * groupSize)"
+          @mousedown="(e) => handleItemClick(e, (i - 1) * props.groupSize + j - 1)"
+          :key="j"
+          @focus="changeCurrentInputIndex((i - 1) * props.groupSize + j - 1)"
+          class="item"
+          :type="props.modelModifiers.pin ? 'number' : 'text'"
+          :pattern="props.modelModifiers.pin ? '[0-9]*' : pattern.source"
+          maxlength="1"
+          :disabled="disabled"
+          :value="value[(i - 1) * props.groupSize + j - 1] || ''"
+        />
+        <span v-if="i !== groups" class="separator">-</span>
+      </template>
     </template>
   </div>
 </template>
